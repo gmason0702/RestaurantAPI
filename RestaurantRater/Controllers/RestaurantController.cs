@@ -13,6 +13,8 @@ namespace RestaurantRater.Controllers
     public class RestaurantController : ApiController
     {
         private readonly RestaurantDbContext _context = new RestaurantDbContext();
+
+        [HttpPost]
         //POST
         public async Task<IHttpActionResult> PostRestaurant(Restaurant restaurant)
         {
@@ -25,6 +27,7 @@ namespace RestaurantRater.Controllers
             return BadRequest(ModelState);
         }
 
+        [HttpGet]
         // GET ALL
         public async Task<IHttpActionResult> GetAll()
         {
@@ -33,6 +36,7 @@ namespace RestaurantRater.Controllers
         }
 
         // GET ID
+        [HttpGet]
         public async Task<IHttpActionResult> GetByID(int id)
         {
             Restaurant restaurant = await _context.Restaurants.FindAsync(id);
@@ -45,7 +49,28 @@ namespace RestaurantRater.Controllers
         }
 
         // PUT (update)
+        [HttpPut]
+        public async Task<IHttpActionResult> UpdateRestaurant([FromUri]int id, [FromBody]Restaurant model)//getting id from URL, getting model from Body
+        {
+            if (ModelState.IsValid && model !=null)
+            {
+                Restaurant restaurant = await _context.Restaurants.FindAsync(id);//restaurant is our entity within the database
 
+                if (restaurant!=null)
+                {
+                    restaurant.Name = model.Name;
+                    restaurant.Rating = model.Rating;
+                    restaurant.Style = model.Style;
+                    restaurant.DollarSigns = model.DollarSigns;
+
+                    await _context.SaveChangesAsync();
+
+                    return Ok();
+                }
+                return NotFound();
+            }
+            return BadRequest(ModelState);
+        }
 
         // DELETE BY ID
     }
