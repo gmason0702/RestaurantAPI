@@ -18,7 +18,7 @@ namespace RestaurantRater.Controllers
         //POST
         public async Task<IHttpActionResult> PostRestaurant(Restaurant restaurant)
         {
-            if (ModelState.IsValid && restaurant!=null)//ModelState is property from APIController
+            if (ModelState.IsValid && restaurant != null)//ModelState is property from APIController
             {
                 _context.Restaurants.Add(restaurant);             //restaurants is the name of the database table we're adding the local _context to, passing in THE restaurant to add it
                 await _context.SaveChangesAsync();//returns int of how many items were changed
@@ -41,7 +41,7 @@ namespace RestaurantRater.Controllers
         {
             Restaurant restaurant = await _context.Restaurants.FindAsync(id);
 
-            if (restaurant==null)
+            if (restaurant == null)
             {
                 return NotFound();
             }
@@ -52,11 +52,11 @@ namespace RestaurantRater.Controllers
         [HttpPut]
         public async Task<IHttpActionResult> UpdateRestaurant([FromUri]int id, [FromBody]Restaurant model)//getting id from URL, getting model from Body
         {
-            if (ModelState.IsValid && model !=null)
+            if (ModelState.IsValid && model != null)
             {
                 Restaurant restaurant = await _context.Restaurants.FindAsync(id);//restaurant is our entity within the database
 
-                if (restaurant!=null)
+                if (restaurant != null)
                 {
                     restaurant.Name = model.Name;
                     restaurant.Rating = model.Rating;
@@ -71,7 +71,21 @@ namespace RestaurantRater.Controllers
             }
             return BadRequest(ModelState);
         }
-
         // DELETE BY ID
+        [HttpDelete]
+        public async Task<IHttpActionResult> DeleteRestaurantByID(int id)
+        {
+            var restaurant = await _context.Restaurants.FindAsync(id);
+            if (restaurant != null)
+            {
+                _context.Restaurants.Remove(restaurant);
+                if (await _context.SaveChangesAsync() == 1)
+                {
+                    return Ok();
+                }
+                return InternalServerError();
+            }
+            return BadRequest();
+        }
     }
 }
